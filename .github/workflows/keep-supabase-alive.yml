@@ -2,17 +2,18 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Chạy vào 00:00 UTC vào ngày 1, 6, 11, 16, 21, 26 hàng tháng (khoảng mỗi 5 ngày)
     - cron: '0 0 */5 * *'
-  workflow_dispatch: # Cho phép bấm chạy thủ công để test bất cứ lúc nào
+  workflow_dispatch:
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Ping Supabase Health Check
         run: |
-          curl -s -o /dev/null -w "%{http_code}\n" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SUPABASE_URL }}/health")
+          echo "Health check HTTP status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            # Dự phòng ping REST API với endpoint gốc
+            curl -s -I "${{ secrets.SUPABASE_URL }}/rest/v1/"
+          fi
