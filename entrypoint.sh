@@ -12,11 +12,11 @@ cat <<EOF > /opt/alist/data/config.json
   "token_expires_in": 48,
   "database": {
     "type": "postgres",
-    "host": "$DB_HOST",
-    "port": $DB_PORT,
-    "user": "$DB_USER",
-    "password": "$DB_PASSWORD",
-    "name": "$DB_NAME",
+    "host": "${DB_HOST}",
+    "port": ${DB_PORT},
+    "user": "${DB_USER}",
+    "password": "${DB_PASSWORD}",
+    "name": "${DB_NAME}",
     "db_file": "",
     "table_prefix": "x_",
     "ssl_mode": "require"
@@ -32,6 +32,12 @@ cat <<EOF > /opt/alist/data/config.json
 }
 EOF
 
-echo "Config generated with Host: $DB_HOST, Port: $DB_PORT, User: $DB_USER"
+# Tự động gán mật khẩu theo biến môi trường nếu có
+if [ -n "$ALIST_ADMIN_PASSWORD" ]; then
+  echo "Setting admin password from environment variable..."
+  /opt/alist/alist admin set "$ALIST_ADMIN_PASSWORD"
+fi
+
+echo "Starting AList with host: ${DB_HOST}..."
 cd /opt/alist
 exec /opt/alist/alist server --no-prefix
