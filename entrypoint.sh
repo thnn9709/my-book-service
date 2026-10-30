@@ -1,10 +1,8 @@
 #!/bin/sh
 set -e
 
-# Đảm bảo thư mục data tồn tại
 mkdir -p /opt/alist/data
 
-# Tạo file config.json với đường dẫn tuyệt đối
 cat <<EOF > /opt/alist/data/config.json
 {
   "force": false,
@@ -14,11 +12,11 @@ cat <<EOF > /opt/alist/data/config.json
   "token_expires_in": 48,
   "database": {
     "type": "postgres",
-    "host": "${DB_HOST}",
-    "port": ${DB_PORT:-5432},
-    "user": "${DB_USER:-postgres}",
-    "password": "${DB_PASSWORD}",
-    "name": "${DB_NAME:-postgres}",
+    "host": "$DB_HOST",
+    "port": $DB_PORT,
+    "user": "$DB_USER",
+    "password": "$DB_PASSWORD",
+    "name": "$DB_NAME",
     "db_file": "",
     "table_prefix": "x_",
     "ssl_mode": "require"
@@ -34,9 +32,6 @@ cat <<EOF > /opt/alist/data/config.json
 }
 EOF
 
-# In ra log xác nhận
-echo "Config file created successfully. Starting AList in debug mode..."
-
-# Chạy với cờ --debug để in toàn bộ thông báo kết nối DB
+echo "Config generated with Host: $DB_HOST, Port: $DB_PORT, User: $DB_USER"
 cd /opt/alist
-exec /opt/alist/alist server --no-prefix --debug
+exec /opt/alist/alist server --no-prefix
