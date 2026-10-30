@@ -1,4 +1,10 @@
 #!/bin/sh
+set -e
+
+# Đảm bảo thư mục data tồn tại
+mkdir -p /opt/alist/data
+
+# Tạo file config.json với đường dẫn tuyệt đối
 cat <<EOF > /opt/alist/data/config.json
 {
   "force": false,
@@ -7,7 +13,7 @@ cat <<EOF > /opt/alist/data/config.json
   "jwt_secret": "my-alist-secret-key-render-kobo",
   "token_expires_in": 48,
   "database": {
-    "type": "${DB_TYPE:-postgres}",
+    "type": "postgres",
     "host": "${DB_HOST}",
     "port": ${DB_PORT:-5432},
     "user": "${DB_USER:-postgres}",
@@ -15,7 +21,7 @@ cat <<EOF > /opt/alist/data/config.json
     "name": "${DB_NAME:-postgres}",
     "db_file": "",
     "table_prefix": "x_",
-    "ssl_mode": "${DB_SSL_MODE:-require}"
+    "ssl_mode": "require"
   },
   "scheme": {
     "address": "0.0.0.0",
@@ -28,4 +34,9 @@ cat <<EOF > /opt/alist/data/config.json
 }
 EOF
 
-exec /opt/alist/alist server --no-prefix
+# In ra log xác nhận
+echo "Config file created successfully. Starting AList in debug mode..."
+
+# Chạy với cờ --debug để in toàn bộ thông báo kết nối DB
+cd /opt/alist
+exec /opt/alist/alist server --no-prefix --debug
